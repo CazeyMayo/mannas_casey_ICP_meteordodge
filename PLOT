@@ -1,0 +1,23 @@
+'''
+Simple game:
+Top down view of Earth
+player is a dinosaur
+Meteors fall on the dino 
+You need to dogde them
+gain points when you dodge them
+water slows you down a little
+There will be diffrent modes to play:
+    timed mode with multiple levels, 
+    once you beat all of the levels you get infinite mode
+    there is inveted mode(colors invert), 
+    might add meteor mode where you lauch meteors at an ai dino (or even other players if multi-player is posible)
+
+There are special events that can be triggered:
+    like a meteor will hit the egde of earth fliping it 
+        (it will viualy flip sides like a coin toss, the player will need to jump over it,
+         water and land switch places i.e. affrica becomes water and pacific ocean becomes land)
+    
+game ends when time is up or dino gets hit
+
+
+'''

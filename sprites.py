@@ -36,21 +36,26 @@ class Player(Sprite):
         self.groups = game.all_sprites
         Sprite.__init__(self, self.groups)
         self.game = game
+        #this provides us with raster images for use in animation
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image = self.spritesheet.get_image(0, 0, TILESIZE, TILESIZE)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT
+        self.rect.x = x
+        self.rect.y =y
         self.vel = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         #animation
-        self.current_frame =False
+        #cycles through animations
+        self.current_frame = 0
+        self.last_update = 0
+        #accounting for the states of the player
         self.jumping = False
         self.moving = False
-
-
         print('Player instance created:', x, y)
+        self.load_images()
 
     #the player input    
     def get_keys(self):
@@ -70,7 +75,7 @@ class Player(Sprite):
     def jump(self):
         pass
     def load_images(self):
-        self.idle_frames = [self.spritesheet.get_image(0,0, TILESIZE,TILESIZE), self.spritesheet.get_image(32,0, TILESIZE,TILESIZE)]
+        self.idle_frames = [self.spritesheet.get_image(0,0, TILESIZE,TILESIZE), self.spritesheet.get_image(32,0, TILESIZE,TILESIZE), self.spritesheet.get_image(64,0, TILESIZE,TILESIZE), self.spritesheet.get_image(96,0, TILESIZE,TILESIZE), self.spritesheet.get_image(128,0, TILESIZE,TILESIZE), self.spritesheet.get_image(160,0, TILESIZE,TILESIZE), self.spritesheet.get_image(192,0, TILESIZE,TILESIZE), self.spritesheet.get_image(224,0, TILESIZE,TILESIZE), self.spritesheet.get_image(256,0, TILESIZE,TILESIZE), self.spritesheet.get_image(288,0, TILESIZE,TILESIZE)]
     
     #More animation
     def animate(self):
@@ -94,6 +99,7 @@ class Player(Sprite):
 
     def update(self):
         self.get_keys()
+        self.animate()
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
@@ -125,3 +131,61 @@ class Wall(Sprite):
             print('Wall instance created')
 
 
+class Enemy(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        #this provides us with raster images for use in animation
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = self.spritesheet.get_image(0, 0, TILESIZE, TILESIZE)
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.hit_rect = PLAYER_HIT_RECT
+        self.rect.x = x
+        self.rect.y =y
+        self.vel = vec(0,0)
+        self.pos = vec(x*TILESIZE,y*TILESIZE)
+        #animation
+        #cycles through animations
+        self.current_frame = 0
+        self.last_update = 0
+        #accounting for the states of the enemy
+        self.jumping = False
+        self.moving = False
+        self.load_images()
+
+    def jump(self):
+        pass
+    def load_images(self):
+        self.idle_frames = [self.spritesheet.get_image(320,0, TILESIZE,TILESIZE)]
+    #More animation
+    def animate(self):
+        now = pg.time.get_ticks()
+        if not self.jumping and not self.moving:
+            if now - self.last_update > 350:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+                bottom = self.rect.bottom
+                self.image = self.idle_frames[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+        elif self.moving:
+            if now - self.last_update > 350:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.moving_frames)
+                bottom = self.rect.bottom
+                self.image = self.moving_frames[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+
+    def update(self):
+        self.animate()
+        self.rect.center = self.pos
+        self.pos += self.vel * self.game.dt
+        self.hit_rect.centerx = self.pos.x
+        collide_with_walls(self, self.game.all_walls, 'x')
+        self.hit_rect.centery = self.pos.y
+        collide_with_walls(self, self.game.all_walls, 'y')
+        self.rect.center = self.hit_rect.center

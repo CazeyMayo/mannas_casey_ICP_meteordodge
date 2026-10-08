@@ -9,6 +9,11 @@ Process - input processed,
 Output - draw new frames, pixels, sound, haptics
 (Store)
 # I do solemnly swear to create concise and informative comments
+
+GOALS: Avoid meteors and the human
+RULES: 
+FEEDBACK:
+FREEDOM:
 '''
 
 import pygame as pg
@@ -49,11 +54,15 @@ class Game:
             for col,tile in enumerate(tiles):
                 if tile == 'P':
                     self.player = Player(self, col, row)
+        for row, tiles in enumerate(self.map.data):
+            for col,tile in enumerate(tiles):
+                if tile == 'E':
+                    self.player = Enemy(self, col, row)
 
 
     def run(self):
         while self.running:
-            self.dt = self.clock.tick(FPS) /1000
+            self.dt = self.clock.tick(FPS) / 1000
             self.events()#gets player input
             self.update()#updates the game
             self.draw()#draws sprites
@@ -67,9 +76,21 @@ class Game:
 #This block of code handles processing of changes based on imput
     def update(self):
         self.all_sprites.update()
+
+    # set up everything we need to draw text on the screen
+    def draw_text(self, text, size, color, x, y):
+        font_name = pg.font.match_font('arial')
+        #instantiates the Font class
+        font = pg.font.Font(font_name, size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (x,y)
+        self.screen.blit(text_surface, text_rect)
+    
     def draw(self):
         self.screen.fill(BLUE)
         self.all_sprites.draw(self.screen)
+        self.draw_text('FPS: ' + str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
         pg.display.flip()
 
 

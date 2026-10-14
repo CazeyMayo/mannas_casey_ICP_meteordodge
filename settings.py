@@ -14,3 +14,6 @@ BLACK = (0, 0, 0)
 #Player settings
 PLAYER_SPEED = 400
 PLAYER_HIT_RECT = pg.Rect(0,0,TILESIZE, TILESIZE)
+def object_hit_rect(object, x, y, tiles):
+    OBJECT_HIT_RECT = pg.Rect(x*tiles, y*tiles, TILESIZE, TILESIZE)
+    return OBJECT_HIT_RECT

@@ -10,7 +10,7 @@ Output - draw new frames, pixels, sound, haptics
 (Store)
 # I do solemnly swear to create concise and informative comments
 
-GOALS: Avoid meteors and the human
+GOALS: The Humans and get the eggs
 RULES: 
 FEEDBACK:
 FREEDOM:
@@ -33,19 +33,34 @@ class Game:
         self.clock = pg.time.Clock()
         self.running = True
         self.playing = True
+        self.ms = 0
+        self.seconds = 0
 
     def load_data(self, map):
         self.game_dir = path.dirname(__file__)
+        self.game_save_dir = path.join(self.game_dir, 'example.txt')
         self.img_dir = path.join(self.game_dir, 'images')
         self.snd_dir = path.join(self.game_dir, 'sounds')
         self.map = Map(path.join(self.game_dir, map))
+        try:
+            with open(self.game_save_dir, 'x', encoding='utf-8') as file:
+                file.write('Hello World!')
+            print('File made sucessfuly')
+        except FileExistsError:
+            print('File already exists')
+        with open(self.game_save_dir, 'r') as f:
+            try:
+                self.highscore = int(f.read())
+            except:
+                self.highscore = 0
 
     def new(self):
         self.load_data('level1.txt')
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_enemy = pg.sprite.Group()
-        # instantiate player, walls, and enemy here
+        self.all_eggs = pg.sprite.Group()
+        # instantiate player, walls, enemy, eggs, here
 
         print(self.map.data)
         for row, tiles in enumerate(self.map.data):
@@ -54,7 +69,8 @@ class Game:
                     Wall(self, col, row)
                 if tile == 'E':
                     Enemy(self, col, row)
-                    print('Position: ', str(col), str(row))
+                if tile == 'L':
+                    Egg(self, col, row)
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == 'P':
@@ -77,6 +93,9 @@ class Game:
     # this block of code handles processing of changes based on input
     def update(self):
         self.all_sprites.update()
+        self.ms += 1
+        self.seconds = self.ms/30
+        self.time = round(self.seconds)
     
     # draw text on screen anywhere 
     def draw_text(self, text, size, color, x, y):
@@ -91,7 +110,9 @@ class Game:
     def draw(self):
         self.screen.fill(BLUE)
         self.all_sprites.draw(self.screen)
-        self.draw_text("Frames per second: " + str(floor(1/self.dt) ), 24, WHITE, WIDTH/2, HEIGHT/4)
+        self.draw_text("Frames per second: " + str(floor(1/self.dt) ), 24, ORANGE, WIDTH/2, HEIGHT/4)
+        self.draw_text(f"Eggs grabbed: {self.player.eggs}", 24, ORANGE, WIDTH/2, HEIGHT/3)
+        self.draw_text(f"Time: {self.time}", 24, ORANGE, WIDTH/2, HEIGHT/2)
         pg.display.flip()
 
 if __name__ == "__main__":

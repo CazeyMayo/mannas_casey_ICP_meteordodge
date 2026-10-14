@@ -54,6 +54,7 @@ class Player(Sprite):
         #accounting for the states of the player
         self.jumping = False
         self.moving = False
+        self.eggs = 0
         print('Player instance created:', x, y)
         self.load_images()
 
@@ -103,6 +104,10 @@ class Player(Sprite):
         self.animate()
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
+        hits = pg.sprite.spritecollide(self, self.game.all_eggs, True)
+        if hits:
+            self.eggs += 1
+            print('You have ', self.eggs, ' coins.')
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
@@ -126,6 +131,24 @@ class Wall(Sprite):
             self.rect.x = self.x
             self.rect.y = self.y
             print('Wall instance created')
+
+
+class Egg(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_eggs
+            Sprite.__init__(self, self.groups)
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            # pg.draw.ellipse(self.image, WHITE, )
+            self.image.fill(WHITE)
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+            self.vx, self.vy = 0,0
+            self.x = x * TILESIZE
+            self.y = y * TILESIZE
+            self.game = game
+            self.rect.x = self.x
+            self.rect.y = self.y
 
 
 class Enemy(Sprite):
@@ -192,8 +215,12 @@ class Enemy(Sprite):
 
     def update(self):
         self.animate()
+        self.follow(self.game.player, self.vel)
         self.pos += self.vel * self.speed * self.game.dt
         self.rect.center = self.pos
         #self.rect.center = self.hit_rect.center
-        self.follow(self.game.player, self.vel)
-        #print('enemy pos: ', self.pos)
+        self.hit_rect.centerx = self.pos.x
+        collide_with_walls(self, self.game.all_walls, 'x')
+        self.hit_rect.centery = self.pos.y
+        collide_with_walls(self, self.game.all_walls, 'y')
+        self.rect.center = self.hit_rect.center

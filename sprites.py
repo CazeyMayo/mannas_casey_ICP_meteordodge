@@ -107,7 +107,8 @@ class Player(Sprite):
         hits = pg.sprite.spritecollide(self, self.game.all_eggs, True)
         if hits:
             self.eggs += 1
-            print('You have ', self.eggs, ' coins.')
+            print('You have', self.eggs,' eggs.')
+            self.game.pickup_snd.play()
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
@@ -137,19 +138,20 @@ class Egg(Sprite):
     def __init__(self, game, x, y):
             self.groups = game.all_sprites, game.all_eggs
             Sprite.__init__(self, self.groups)
+            self.game = game
+            self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
             self.image = pg.Surface((TILESIZE, TILESIZE))
-            # pg.draw.ellipse(self.image, WHITE, )
-            self.image.fill(WHITE)
             self.rect = self.image.get_rect()
+            self.image.set_colorkey(BLACK)
             self.rect.x = x
             self.rect.y = y
             self.vx, self.vy = 0,0
             self.x = x * TILESIZE
             self.y = y * TILESIZE
-            self.game = game
             self.rect.x = self.x
             self.rect.y = self.y
-
+            self.image = self.spritesheet.get_image(448, 0, TILESIZE, TILESIZE)
+            
 
 class Enemy(Sprite):
     def __init__(self, game, x, y):

@@ -3,6 +3,7 @@ from pygame.sprite import Sprite
 from settings import *
 from utils import *
 from os import path
+from random import randint
 
 vec = pg.math.Vector2
 
@@ -108,12 +109,39 @@ class Player(Sprite):
         if hits:
             self.eggs += 1
             print('You have', self.eggs,' eggs.')
-            self.game.pickup_snd.play()
+            #self.game.pickup_snd.play()
+            for i in range(100):
+                Particle(self.game, hits[0].rect.x, hits[0].rect.y)
+
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
+
+class Particle(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game. all_particles
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE/4,TILESIZE/4))
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        self.vel = vec(randint(-180,180),randint(-180,180))
+        self.pos = vec(x, y)
+        self.rect.center = self.pos
+        self.speed = 5
+        self.countdown = Cooldown()
+        self.countdown.event_time = floor(pg.time.get_ticks()/1000)
+
+    def update(self):
+        self.countdown.ticking()
+        self.pos += self.vel * self.speed * self.game.dt
+        if self.countdown.delta > 1:
+            self.kill()
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
+
         
 #wall class with sprite as super class
 class Wall(Sprite):

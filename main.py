@@ -44,7 +44,7 @@ class Game:
         self.img_dir = path.join(self.game_dir, 'images')
         ######################### sound handling ########################
         self.snd_dir = path.join(self.game_dir, 'sounds')
-        self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "egg_pickup.mp3"))
+        #self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "egg_pickup.mp3"))
         self.map = Map(path.join(self.game_dir, map))
 
         try:
@@ -67,6 +67,7 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_enemy = pg.sprite.Group()
+        self.all_particles = pg.sprite.Group()
         self.all_eggs = pg.sprite.Group()
         
         print(self.map.data)
@@ -96,7 +97,10 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 with open(path.join(self.game_dir, self.game_save_file), 'w') as f:
-                    f.write(str(self.highscore))
+                    f.write(str(self.score))
+                if self.score > self.highscore:
+                    with open(path.join(self.game_dir, self.game_save_file), 'w') as f:
+                        f.write(str(self.score))
                 if self.playing:
                     self.playing = False
                 self.running = False

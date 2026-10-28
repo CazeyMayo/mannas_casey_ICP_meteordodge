@@ -69,6 +69,7 @@ class Game:
         self.all_enemy = pg.sprite.Group()
         self.all_particles = pg.sprite.Group()
         self.all_eggs = pg.sprite.Group()
+        self.all_water = pg.sprite.Group()
         
         print(self.map.data)
         for row, tiles in enumerate(self.map.data):
@@ -79,6 +80,7 @@ class Game:
                     Enemy(self, col, row)
                 if tile == 'L':
                     Egg(self, col, row)
+
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == 'P':

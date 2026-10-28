@@ -46,7 +46,9 @@ class Player(Sprite):
         self.hit_rect = PLAYER_HIT_RECT
         self.rect.x = x
         self.rect.y = y
+        #Player motion
         self.vel = vec(0,0)
+        self.acc = vec(0,0)
         self.pos = vec(x, y) * TILESIZE
         #animation
         #cycles through animations
@@ -64,13 +66,17 @@ class Player(Sprite):
         self.vel = vec(0,0)
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
-            self.vel.y = -PLAYER_SPEED
+            # self.vel.y = -PLAYER_SPEED
+            self.acc.y = -5
         if keys[pg.K_a]:
-            self.vel.x = -PLAYER_SPEED
+            # self.vel.x = -PLAYER_SPEED
+            self.acc.x = -5
         if keys[pg.K_s]:
-            self.vel.y = PLAYER_SPEED
+            # self.vel.y = PLAYER_SPEED
+            self.acc.y = 5
         if keys[pg.K_d]:
-            self.vel.x = PLAYER_SPEED
+            # self.vel.x = PLAYER_SPEED
+            self.acc.x = 5
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
 
@@ -101,10 +107,16 @@ class Player(Sprite):
                 self.rect.bottom = bottom
 
     def update(self):
+        self.acc = vec(0,0)
         self.get_keys()
+        self.acc.x += self.vel.x * PLAYER_FRIC
+        self.acc.y += self.vel.y * PLAYER_FRIC
+        self.vel += self.acc
+
         self.animate()
         self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt
+        # self.pos += self.vel * self.game.dt
+        self.pos += self.vel + 0.5 * self.acc
         hits = pg.sprite.spritecollide(self, self.game.all_eggs, True)
         if hits:
             self.eggs += 1

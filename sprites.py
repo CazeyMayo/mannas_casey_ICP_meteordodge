@@ -57,6 +57,7 @@ class Player(Sprite):
         #accounting for the states of the player
         self.jumping = False
         self.moving = False
+        self.cofric = -0.1
         self.eggs = 0
         print('Player instance created:', x, y)
         self.load_images()
@@ -107,16 +108,22 @@ class Player(Sprite):
                 self.rect.bottom = bottom
 
     def update(self):
-        self.acc = vec(0,0)
         self.get_keys()
-        self.acc.x += self.vel.x * PLAYER_FRIC
-        self.acc.y += self.vel.y * PLAYER_FRIC
-        self.vel += self.acc
-
         self.animate()
+
+        water_hits = pg.sprite.spritecollide(self, self.game.all_water, False)
+        if water_hits:
+            if water_hits[0]:
+                self.cofric = -0.001
+        else:
+            self.cofric = -0.1
+        self.acc = vec(0,0)
+        self.acc.x += self.vel.x * self.cofric
+        self.acc.y += self.vel.y * self.cofric
+        self.vel += self.acc
         self.rect.center = self.pos
         # self.pos += self.vel * self.game.dt
-        self.pos += self.vel + 0.5 * self.acc
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc 
         hits = pg.sprite.spritecollide(self, self.game.all_eggs, True)
         if hits:
             self.eggs += 1
@@ -124,7 +131,6 @@ class Player(Sprite):
             #self.game.pickup_snd.play()
             for i in range(100):
                 Particle(self.game, hits[0].rect.x, hits[0].rect.y)
-
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
@@ -172,6 +178,22 @@ class Wall(Sprite):
             self.rect.x = self.x
             self.rect.y = self.y
             print('Wall instance created')
+
+class Water(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_water
+            Sprite.__init__(self, self.groups)
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image.fill(LIGHT_BLUE)
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+            self.vx, self.vy = 0,0
+            self.x = x * TILESIZE
+            self.y = y * TILESIZE
+            self.game = game
+            self.rect.x = self.x
+            self.rect.y = self.y
 
 
 class Egg(Sprite):

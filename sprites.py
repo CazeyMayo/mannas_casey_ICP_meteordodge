@@ -44,8 +44,8 @@ class Player(Sprite):
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT
-        self.rect.x = x
-        self.rect.y = y
+        # self.rect.x = x
+        # self.rect.y = y
         #Player motion
         self.vel = vec(0,0)
         self.acc = vec(0,0)
@@ -57,26 +57,21 @@ class Player(Sprite):
         #accounting for the states of the player
         self.jumping = False
         self.moving = False
-        self.cofric = -0.1
+        self.cofric = PLAYER_FRIC
         self.eggs = 0
         print('Player instance created:', x, y)
         self.load_images()
 
     #the player input    
     def get_keys(self):
-        self.vel = vec(0,0)
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
-            # self.vel.y = -PLAYER_SPEED
             self.acc.y = -5
         if keys[pg.K_a]:
-            # self.vel.x = -PLAYER_SPEED
             self.acc.x = -5
         if keys[pg.K_s]:
-            # self.vel.y = PLAYER_SPEED
             self.acc.y = 5
         if keys[pg.K_d]:
-            # self.vel.x = PLAYER_SPEED
             self.acc.x = 5
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
@@ -108,8 +103,17 @@ class Player(Sprite):
                 self.rect.bottom = bottom
 
     def update(self):
-        self.get_keys()
         self.animate()
+        self.acc = vec(0,0)
+        self.get_keys()
+        self.acc.x += self.vel.x * self.cofric
+        self.acc.y += self.vel.y * self.cofric
+        self.vel += self.acc
+
+        if abs(self.vel.x) < 0.1:
+            self.vel.x = 0
+        if abs(self.vel.y) < 0.1:
+            self.vel.y = 0
 
         water_hits = pg.sprite.spritecollide(self, self.game.all_water, False)
         if water_hits:
@@ -117,13 +121,10 @@ class Player(Sprite):
                 self.cofric = -0.001
         else:
             self.cofric = -0.1
-        self.acc = vec(0,0)
-        self.acc.x += self.vel.x * self.cofric
-        self.acc.y += self.vel.y * self.cofric
-        self.vel += self.acc
+        
         self.rect.center = self.pos
         # self.pos += self.vel * self.game.dt
-        self.pos += self.vel * self.game.dt + 0.5 * self.acc 
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc * (self.game.dt ** 2)
         hits = pg.sprite.spritecollide(self, self.game.all_eggs, True)
         if hits:
             self.eggs += 1

@@ -14,7 +14,8 @@ ORANGE = (253,190,2)
 LIGHT_BLUE = (70,130,180)
 
 #Player settings
-PLAYER_SPEED = 50
+PLAYER_ACC = 50
+PLAYER_FRIC = -0.1
 PLAYER_HIT_RECT = pg.Rect(0,0,TILESIZE, TILESIZE)
 
 def object_hit_rect(object, x, y, tiles):

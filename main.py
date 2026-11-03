@@ -10,10 +10,10 @@ Output - draw new frames, pixels, sound, haptics
 (Store)
 # I do solemnly swear to create concise and informative comments
 
-GOALS: The Humans and get the eggs
-RULES: 
-FEEDBACK:
-FREEDOM:
+GOALS: Avoid the Humans and get the eggs
+RULES: When the players touch you you die
+FEEDBACK: roar sound
+FREEDOM: Can move where the want
 '''
 
 import pygame as pg

@@ -66,13 +66,13 @@ class Player(Sprite):
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
-            self.acc.y = -5
+            self.acc.y = -PLAYER_ACC
         if keys[pg.K_a]:
-            self.acc.x = -5
+            self.acc.x = -PLAYER_ACC
         if keys[pg.K_s]:
-            self.acc.y = 5
+            self.acc.y = PLAYER_ACC
         if keys[pg.K_d]:
-            self.acc.x = 5
+            self.acc.x = PLAYER_ACC
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
 

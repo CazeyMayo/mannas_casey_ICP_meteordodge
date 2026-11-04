@@ -80,7 +80,7 @@ class Game:
                     Enemy(self, col, row)
                 if tile == 'L':
                     Egg(self, col, row)
-                if tile == 'W':
+                if tile == 'I':
                     Water(self, col, row)
 
         for row, tiles in enumerate(self.map.data):

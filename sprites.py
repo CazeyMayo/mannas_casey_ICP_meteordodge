@@ -10,7 +10,7 @@ vec = pg.math.Vector2
 def collide_hit_rect(one,two):
     return one.hit_rect.colliderect(two.rect)
 
-def collide_with_walls(sprite, group, dir):
+def collide_with_things(sprite, group, dir):
     if dir == 'x':
         hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
         if hits:
@@ -115,10 +115,17 @@ class Player(Sprite):
         if abs(self.vel.y) < 0.1:
             self.vel.y = 0
 
+        ice_hits = pg.sprite.spritecollide(self, self.game.all_ice, False)
+        if ice_hits:
+            if ice_hits[0]:
+                self.cofric = -0.001
+        else:
+            self.cofric = -0.1
+
         water_hits = pg.sprite.spritecollide(self, self.game.all_water, False)
         if water_hits:
             if water_hits[0]:
-                self.cofric = -0.001
+                self.cofric = -0.5
         else:
             self.cofric = -0.1
         
@@ -133,9 +140,9 @@ class Player(Sprite):
             for i in range(100):
                 Particle(self.game, hits[0].rect.x, hits[0].rect.y)
         self.hit_rect.centerx = self.pos.x
-        collide_with_walls(self, self.game.all_walls, 'x')
+        collide_with_things(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.all_walls, 'y')
+        collide_with_things(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
 
 class Particle(Sprite):
@@ -180,12 +187,28 @@ class Wall(Sprite):
             self.rect.y = self.y
             print('Wall instance created')
 
-class Water(Sprite):
+class Ice(Sprite):
     def __init__(self, game, x, y):
             self.groups = game.all_sprites, game.all_water
             Sprite.__init__(self, self.groups)
             self.image = pg.Surface((TILESIZE, TILESIZE))
             self.image.fill(LIGHT_BLUE)
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+            self.vx, self.vy = 0,0
+            self.x = x * TILESIZE
+            self.y = y * TILESIZE
+            self.game = game
+            self.rect.x = self.x
+            self.rect.y = self.y
+
+class Water(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_water
+            Sprite.__init__(self, self.groups)
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image.fill(DARK_BLUE)
             self.rect = self.image.get_rect()
             self.rect.x = x
             self.rect.y = y
@@ -229,10 +252,10 @@ class Enemy(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.speed = 100
+        self.speed = 75
         self.vel = vec(0,0)
         self.pos = vec(x,y) * TILESIZE
-        self.hit_rect = object_hit_rect(Enemy, x, y, TILESIZE)
+        self.hit_rect = object_hit_rect(Enemy, x, y, TILESIZE, -20)
         # animation stuff
         # starts with the current frame and last update at zero
         self.current_frame = 0
@@ -266,26 +289,39 @@ class Enemy(Sprite):
                     self.rect.bottom = bottom
 
 
-    def follow(self, obj, velocity):
-        if self.pos.x > obj.pos.x:
-            self.vel.x = -2
+    def follow(self, obj, velocity, on_off):
+        if on_off == True:
+            if self.pos.x > obj.pos.x:
+                self.vel.x = -2
+            else:
+                self.vel.x = 2
+            if self.pos.y < obj.pos.y:
+                self.vel.y = 2
+            else:
+                self.vel.y = -2
         else:
-            self.vel.x = 2
-        if self.pos.y < obj.pos.y:
-            self.vel.y = 2
-        else:
-            self.vel.y = -2
+            self.vel.x = 0
+            self.vel.y = 0
             
 
 
     def update(self):
         self.animate()
-        self.follow(self.game.player, self.vel)
+        #
+        #hits = pg.sprite.spritecollide(self, self.game.all_enemy, False)
+        #if hits:
+
+        self.follow(self.game.player, self.vel, True)
         self.pos += self.vel * self.speed * self.game.dt
         self.rect.center = self.pos
         #self.rect.center = self.hit_rect.center
         self.hit_rect.centerx = self.pos.x
-        collide_with_walls(self, self.game.all_walls, 'x')
+        collide_with_things(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.all_walls, 'y')
+        collide_with_things(self, self.game.all_walls, 'y')
+        self.rect.center = self.hit_rect.center
+        #colision with other enemies
+        collide_with_things(self, self.game.all_enemy, 'x')
+        self.hit_rect.centery = self.pos.y
+        collide_with_things(self, self.game.all_enemy, 'y')
         self.rect.center = self.hit_rect.center

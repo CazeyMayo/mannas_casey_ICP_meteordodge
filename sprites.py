@@ -115,10 +115,12 @@ class Player(Sprite):
         if abs(self.vel.y) < 0.1:
             self.vel.y = 0
 
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc * (self.game.dt ** 2)
         ice_hits = pg.sprite.spritecollide(self, self.game.all_ice, False)
         if ice_hits:
             if ice_hits[0]:
-                self.cofric = -0.001
+                self.cofric = -0.0001  
+                print('ice triggered')
         else:
             self.cofric = -0.1
 
@@ -131,7 +133,7 @@ class Player(Sprite):
         
         self.rect.center = self.pos
         # self.pos += self.vel * self.game.dt
-        self.pos += self.vel * self.game.dt + 0.5 * self.acc * (self.game.dt ** 2)
+        # self.pos += self.vel * self.game.dt + 0.5 * self.acc * (self.game.dt ** 2)
         hits = pg.sprite.spritecollide(self, self.game.all_eggs, True)
         if hits:
             self.eggs += 1
@@ -189,7 +191,7 @@ class Wall(Sprite):
 
 class Ice(Sprite):
     def __init__(self, game, x, y):
-            self.groups = game.all_sprites, game.all_water
+            self.groups = game.all_sprites, game.all_ice
             Sprite.__init__(self, self.groups)
             self.image = pg.Surface((TILESIZE, TILESIZE))
             self.image.fill(LIGHT_BLUE)

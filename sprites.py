@@ -189,6 +189,7 @@ class Wall(Sprite):
             self.rect.y = self.y
             print('Wall instance created')
 
+#makes the ice sprite
 class Ice(Sprite):
     def __init__(self, game, x, y):
             self.groups = game.all_sprites, game.all_ice
@@ -205,6 +206,7 @@ class Ice(Sprite):
             self.rect.x = self.x
             self.rect.y = self.y
 
+#makes a water sprite 
 class Water(Sprite):
     def __init__(self, game, x, y):
             self.groups = game.all_sprites, game.all_water
@@ -221,7 +223,26 @@ class Water(Sprite):
             self.rect.x = self.x
             self.rect.y = self.y
 
+class Bush(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_bush
+            Sprite.__init__(self, self.groups)
+            self.game = game
+            self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.rect = self.image.get_rect()
+            self.image.set_colorkey(BLACK)
+            self.rect.x = x
+            self.rect.y = y
+            self.vx, self.vy = 0,0
+            self.x = x * TILESIZE
+            self.y = y * TILESIZE
+            self.game = game
+            self.rect.x = self.x
+            self.rect.y = self.y
+            self.image = self.spritesheet.get_image(864, 0, TILESIZE, TILESIZE)
 
+#makes and egg sprite
 class Egg(Sprite):
     def __init__(self, game, x, y):
             self.groups = game.all_sprites, game.all_eggs

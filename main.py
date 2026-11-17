@@ -71,6 +71,7 @@ class Game:
         self.all_eggs = pg.sprite.Group()
         self.all_ice = pg.sprite.Group()
         self.all_water = pg.sprite.Group()
+        self.all_bush = pg.sprite.Group()
         
         print(self.map.data)
         for row, tiles in enumerate(self.map.data):
@@ -83,7 +84,8 @@ class Game:
                     Ice(self, col, row)
                 if tile == 'W':
                     Water(self, col, row)
-                
+                if tile == 'B':
+                    Bush(self, col, row)
                 if tile == 'E':
                     Enemy(self, col, row)
         for row, tiles in enumerate(self.map.data):
